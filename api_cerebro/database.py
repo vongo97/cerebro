@@ -10,18 +10,25 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 class Database:
     def __init__(self):
+        print("======== CEREBRO DB CONFIG ========")
+        print("Versión del código: 1.1 (Con Validación)")
         url = os.getenv("SUPABASE_URL")
         key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
         if not url or "tu_proyecto" in url:
-            raise ValueError("SUPABASE_URL no está configurada correctamente en Render (actualmente: " + str(url) + ")")
-        if not key or "tu_service_role" in key:
-            raise ValueError("SUPABASE_SERVICE_ROLE_KEY no está configurada correctamente.")
-            
+            print(f"ERROR: SUPABASE_URL inválida: {url}")
+            raise ValueError("SUPABASE_URL no configurada o sigue siendo el valor de ejemplo.")
+        
+        # Mostrar solo los primeros caracteres por seguridad
+        key_preview = f"{key[:10]}..." if key else "NULA"
+        print(f"CEREBRO_LOG: Intentando conectar a {url} con llave {key_preview}")
+
         try:
             self.client: Client = create_client(url, key)
+            print("CEREBRO_LOG: Cliente Supabase creado exitosamente.")
         except Exception as e:
-            raise Exception(f"Error al conectar con Supabase. Verifica la URL y la Key. Detalle: {e}")
+            print(f"CEREBRO_LOG: Error crítico en create_client: {e}")
+            raise
 
     def save_message(self, session_id: str, role: str, content: str, model_used: str = None, tokens: int = 0):
         data = {
